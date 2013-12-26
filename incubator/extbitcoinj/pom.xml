@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>Bkbc_Incubator_Extbitcoinj</groupId>
+  <artifactId>Bkbc_Incubator_Extbitcoinj</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source/>
+          <target/>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+    <!-- Depend on bitcoinj -->
+  <repositories>
+    <repository>
+      <id>bitcoinj</id>
+      <url>http://distribution.bitcoinj.googlecode.com/git/releases/</url>
+    </repository>
+  </repositories>
+  <dependencies>
+  	<dependency>
+  		<groupId>com.google.guava</groupId>
+  		<artifactId>guava</artifactId>
+  		<version>15.0</version>
+  	</dependency>
+  	 <dependency>
+      <groupId>com.google</groupId>
+      <artifactId>bitcoinj</artifactId>
+      <version>0.10.2</version>
+      <scope>compile</scope>
+    </dependency>
+  	 <dependency>
+  	 	<groupId>org.slf4j</groupId>
+  	 	<artifactId>slf4j-simple</artifactId>
+  	 	<version>1.7.5</version>
+  	 </dependency>
+  </dependencies>
+</project>
