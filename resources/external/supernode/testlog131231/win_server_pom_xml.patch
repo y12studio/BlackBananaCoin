@@ -1,0 +1,14 @@
+diff --git a/server/pom.xml b/server/pom.xml
+index bc35608..7f96391 100644
+--- a/server/pom.xml
++++ b/server/pom.xml
+@@ -114,6 +114,9 @@
+                 <groupId>com.google.protobuf.tools</groupId>
+                 <artifactId>maven-protoc-plugin</artifactId>
+                 <version>0.1.10</version>
++                	 <configuration>
++          <protocExecutable>C:\y12\tools\protoc-2.4.1-win32\protoc.exe</protocExecutable>
++        </configuration>
+                 <executions>
+                     <execution>
+                         <goals>
