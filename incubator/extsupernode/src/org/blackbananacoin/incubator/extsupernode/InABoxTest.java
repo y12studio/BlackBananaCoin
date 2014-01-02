@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Y12STUDIO
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.blackbananacoin.incubator.extsupernode;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -23,13 +38,15 @@ import com.bitsofproof.supernode.wallet.AddressListAccountManager;
 import com.bitsofproof.supernode.wallet.KeyListAccountManager;
 
 public class InABoxTest {
+
 	private static final Logger log = LoggerFactory.getLogger(InABoxTest.class);
+	private int sendBtc = 6;
 	private static SuperNodeApiTester box;
 	private static BCSAPI api;
 
 	public void init() throws IOException, ValidationException,
 			BCSAPIException, InterruptedException {
-		box = new SuperNodeApiTester(new MineTestChain());
+		box = new SuperNodeApiTester(new MinerTestChain());
 		api = box.getApi();
 		run();
 	}
@@ -77,7 +94,7 @@ public class InABoxTest {
 		box.mine(10, 2, 1000);
 
 		for (int i = 0; i < 10; ++i) {
-			log.info("[WHAT {} ]", i);
+			log.info("[Pay Target : {} ]", i);
 			try {
 				blockMined.acquireUninterruptibly();
 				minerAccountChanged.acquireUninterruptibly();
@@ -86,10 +103,11 @@ public class InABoxTest {
 					targetAccountChanged.acquireUninterruptibly();
 				}
 
-				log.info("[MinerAccount balance={}, SEND Target 10BTC]",
+				log.info("[MinerAccount balance={}, SEND Target " + sendBtc
+						+ " BTC]",
 						BkbcUtils.toBtcStr(minerAccount.getBalance()));
-				Transaction t = minerAccount.pay(target, 10 * BkbcUtils.BTC, 0,
-						true);
+				Transaction t = minerAccount.pay(target, sendBtc
+						* BkbcUtils.BTC, 0, true);
 				api.sendTransaction(t);
 				targetAccountChanged.acquireUninterruptibly();
 				minerAccountChanged.acquireUninterruptibly();
@@ -105,9 +123,6 @@ public class InABoxTest {
 				+ BkbcUtils.toBtcStr(minerAccount.getBalance()));
 		log.debug("target balance="
 				+ BkbcUtils.toBtcStr(targetAccount.getBalance()));
-		// assertTrue (minerAccount.getBalance () == 10 * 40 * 100000000L);
-		// assertTrue (targetAccount.getBalance () == 10 * 10 * 100000000L);
-		
 		box.showStatResult();
 	}
 

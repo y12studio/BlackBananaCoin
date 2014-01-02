@@ -1,3 +1,18 @@
+/*
+ * Copyright 2013 Y12STUDIO
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.blackbananacoin.incubator.extsupernode;
 
 import java.math.BigInteger;
@@ -15,9 +30,9 @@ import com.bitsofproof.supernode.model.Tx;
 import com.bitsofproof.supernode.model.TxIn;
 import com.bitsofproof.supernode.model.TxOut;
 
-public class MineTestChain  implements Chain{
+public class MinerTestChain  implements Chain{
 	
-	public static final int REWARD_COINS = 77;
+	public static final int REWARD_COINS = 70;
 	
 	static final byte[] SATOSHI_KEY = Hex
 			.decode ("04fc9702847840aaf195de8442ebecedf5b095cdbb9bc716bda9110971b28a49e0ead8564ff0db22209e0374782c093bb899692d524e9d6a6956e7c5ecbcd68284");
@@ -117,14 +132,18 @@ public class MineTestChain  implements Chain{
 		//  [Mine count] mean=161896.8,stddev=119938.72624691881 
 		//block.setDifficultyTarget (0x1e7fffff);
 
+		// [Mine count] mean=607.1,stddev=627.4757985594167 
+		//block.setDifficultyTarget (0x1fffffff);
+
+		// [Mine count] mean=1364.3,stddev=700.0374672512577 
+		block.setDifficultyTarget (0x1f9fffff);
+		
 		//  [Mine count] mean=382.0,stddev=245.5691801147331 
 		// block.setDifficultyTarget (0x1f7fffff);
-		
-		// [Mine count] mean=607.1,stddev=627.4757985594167 
-		block.setDifficultyTarget (0x1fffffff);
-		
+
 		//  [Mine count] mean=2.1,stddev=1.3703203194062978 
 		//block.setDifficultyTarget (0x207fffff);
+		
 		block.setNonce (2);
 		block.setPreviousHash (Hash.ZERO_HASH_STRING);
 

@@ -54,6 +54,85 @@ import com.google.common.collect.Range;
 
 public class SuperNodeApiTester {
 
+	private final class MyFoo implements Runnable {
+		private final int numberOfTxInBlock;
+		private final BlockingQueue<Transaction> mempool;
+		private final int nblocks;
+		private final Set<String> seen;
+		private final int timeout;
+
+		private MyFoo(int numberOfTxInBlock,
+				BlockingQueue<Transaction> mempool, int nblocks,
+				Set<String> seen, int timeout) {
+			this.numberOfTxInBlock = numberOfTxInBlock;
+			this.mempool = mempool;
+			this.nblocks = nblocks;
+			this.seen = seen;
+			this.timeout = timeout;
+		}
+
+		public void run() {
+			txhandler.addTransactionListener(new MineTxListener(seen, mempool));
+			String previousHash = chain.getGenesis().getHash();
+			for (int blockHeight = 1; blockHeight <= nblocks; ++blockHeight) {
+				try {
+					Block block = prepareBlockToMine(previousHash, blockHeight);
+					mineBlock(block);
+					previousHash = block.getHash();
+					getApi().sendBlock(block);
+				} catch (ValidationException | BCSAPIException e) {
+					log.error("Server in a box ", e);
+				}
+			}
+		}
+
+		private Block prepareBlockToMine(String previousHash, int blockHeight)
+				throws ValidationException {
+			Transaction coinbase = Transaction.createCoinbase(minerAddress,
+					MinerTestChain.REWARD_COINS * BkbcUtils.BTC,
+					blockHeight);
+			Block block = createBlock(previousHash, coinbase);
+			if (blockHeight > 1) {
+				mempool.drainTo(block.getTransactions());
+				if (block.getTransactions().size() < numberOfTxInBlock) {
+					try {
+						Transaction t = mempool.poll(timeout,
+								TimeUnit.MILLISECONDS);
+						if (t != null) {
+							block.getTransactions().add(t);
+							mempool.drainTo(block.getTransactions());
+						}
+					} catch (InterruptedException e) {
+					}
+				}
+			}
+			return block;
+		}
+	}
+
+	private final class MineTxListener implements TxListener {
+		private final Set<String> seen;
+		private final BlockingQueue<Transaction> mempool;
+
+		private MineTxListener(Set<String> seen, BlockingQueue<Transaction> mempool) {
+			this.seen = seen;
+			this.mempool = mempool;
+		}
+
+		public void process(Tx transaction, boolean doubleSpend) {
+			synchronized (seen) {
+				if (!transaction.getInputs().get(0).getSourceHash()
+						.equals(Hash.ZERO_HASH_STRING)
+						&& !seen.contains(transaction.getHash())) {
+					Transaction t = Transaction
+							.fromWireDump(transaction.toWireDump());
+					mempool.offer(t);
+					seen.add(transaction.getHash());
+				}
+			}
+		}
+	}
+
 	// Get a DescriptiveStatistics instance
 	private DescriptiveStatistics statsMs = new DescriptiveStatistics();
 	private DescriptiveStatistics statsCount = new DescriptiveStatistics();
@@ -72,7 +151,7 @@ public class SuperNodeApiTester {
 
 	private final Chain chain;
 
-	private Address newCoinsAddress;
+	private Address minerAddress;
 
 	public SuperNodeApiTester(Chain theChain) {
 		this.chain = theChain;
@@ -84,7 +163,7 @@ public class SuperNodeApiTester {
 	}
 
 	public void setNewCoinsAddress(Address a) {
-		newCoinsAddress = a;
+		minerAddress = a;
 	}
 
 	public void mineBlock(Block b) {
@@ -114,57 +193,7 @@ public class SuperNodeApiTester {
 			final int timeout) {
 		final BlockingQueue<Transaction> mempool = new LinkedBlockingQueue<Transaction>();
 		final Set<String> seen = new HashSet<String>();
-
-		Thread miner = new Thread(new Runnable() {
-			public void run() {
-				log.debug("miner run");
-				txhandler.addTransactionListener(new TxListener() {
-					public void process(Tx transaction, boolean doubleSpend) {
-						synchronized (seen) {
-							if (!transaction.getInputs().get(0).getSourceHash()
-									.equals(Hash.ZERO_HASH_STRING)
-									&& !seen.contains(transaction.getHash())) {
-								Transaction t = Transaction
-										.fromWireDump(transaction.toWireDump());
-								mempool.offer(t);
-								seen.add(transaction.getHash());
-							}
-						}
-					}
-				});
-				String previousHash = chain.getGenesis().getHash();
-				for (int blockHeight = 1; blockHeight <= nblocks; ++blockHeight) {
-					Transaction coinbase = null;
-					try {
-						coinbase = Transaction.createCoinbase(newCoinsAddress,
-								MineTestChain.REWARD_COINS * BkbcUtils.BTC,
-								blockHeight);
-						Block block = createBlock(previousHash, coinbase);
-
-						if (blockHeight > 1) {
-							mempool.drainTo(block.getTransactions());
-							if (block.getTransactions().size() < numberOfTxInBlock) {
-								try {
-									Transaction t = mempool.poll(timeout,
-											TimeUnit.MILLISECONDS);
-									if (t != null) {
-										block.getTransactions().add(t);
-										mempool.drainTo(block.getTransactions());
-									}
-								} catch (InterruptedException e) {
-								}
-							}
-						}
-
-						mineBlock(block);
-						previousHash = block.getHash();
-						getApi().sendBlock(block);
-					} catch (ValidationException | BCSAPIException e) {
-						log.error("Server in a box ", e);
-					}
-				}
-			}
-		});
+		Thread miner = new Thread(new MyFoo(numberOfTxInBlock, mempool, nblocks, seen, timeout));
 		miner.setName("Miner in the box");
 		miner.setDaemon(true);
 		miner.start();
