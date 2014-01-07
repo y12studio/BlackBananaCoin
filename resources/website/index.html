@@ -1,83 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="">
+<meta name="author" content="">
 
-    <title>黑蕉幣 BKBC - BlacK Banana Coin</title>
-    <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+<title>黑蕉幣 BKBC - BlacK Banana Coin</title>
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
 
 <!-- Optional theme -->
-<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
-
+<link rel="stylesheet"
+	href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap-theme.min.css">
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+	
+</script>
 <!-- Latest compiled and minified JavaScript -->
-<script src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script
+	src="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
 
-    <!-- Custom styles for this template -->
-    <link href="jumbotron-narrow.css" rel="stylesheet">
+<!-- Custom styles for this template -->
+<link href="jumbotron-narrow.css" rel="stylesheet">
 
-    <!-- Just for debugging purposes. Don't actually copy this line! -->
-    <!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+<!-- Just for debugging purposes. Don't actually copy this line! -->
+<!--[if lt IE 9]><script src="../../docs-assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
+<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-  </head>
+    
+<script>
+$(document).ready(function(){    
+	$.getJSON("json/twdbtc.json",function(data){
+		console.log(data.usdPerBtc);
+		var twdPerBtc = data.usdPerBtc*data.twdPerUsd;
+		$("#twdPerBtc").text(twdPerBtc.toFixed(2));
+		$("#twdTxFee").text(data.twdMinTxFee.toFixed(2));
+		var d = new Date(data.updateTimeMs);
+		$("#updateTime").text(d.toLocaleDateString()+' '+d.toLocaleTimeString());
+	});
+});
+</script>
+</head>
 
-  <body>
+<body>
 
-    <div class="container">
-      <div class="header">
-        <ul class="nav nav-pills pull-right">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="https://github.com/y12studio/BlackBananaCoin">關於</a></li>
-          <li><a href="https://github.com/y12studio/BlackBananaCoin">聯絡</a></li>
-        </ul>
-        <h3 class="text-muted">黑蕉幣 BKBC</h3>
-      </div>
+	<div class="container">
+		<div class="header">
+			<ul class="nav nav-pills pull-right">
+				<li class="active"><a href="#">Home</a></li>
+				<li><a href="https://github.com/y12studio/BlackBananaCoin">關於</a></li>
+				<li><a href="https://github.com/y12studio/BlackBananaCoin">聯絡</a></li>
+			</ul>
+			<h3 class="text-muted">黑蕉幣 BKBC</h3>
+		</div>
 
-      <div class="jumbotron">
-        <h1>黑蕉幣 BKBC</h1>
-        <p class="lead">BlacK Banana Coin(BKBC)建立類似比特幣的數位幣線上交易系統</p>
-        <p><img src="img/black_banana.png"></p>
-        <p><a class="btn btn-lg btn-success" href="https://github.com/y12studio/BlackBananaCoin" role="button">加入專案</a></p>
-      </div>
+		<div class="jumbotron">
+			<h1>黑蕉幣專案 BKBC</h1>
+			<p class="lead">BlacK Banana Coin(BKBC)建立測試研究比特幣線上交易系統</p>
+			<p>
+				<img src="img/black_banana.png">
+			</p>
+			<p>
+				<a class="btn btn-lg btn-success"
+					href="https://github.com/y12studio/BlackBananaCoin" role="button">加入專案</a>
+			</p>
+		</div>
+		
+		<div class="jumbotron">
+			<p class="lead">即時資訊</p>
+			<p class="lead">1比特幣(BTC)~=<span id="twdPerBtc" class="label label-danger">0</span>新台幣(TWD)</p>
+			<p class="lead">最低手續費0.0001BTC~=<span id="twdTxFee" class="label label-danger">0</span>新台幣(TWD)</p>
+			<p class="lead">更新時間<span id="updateTime">2014-01-04</span></p>
+		</div>
 
-      <div class="row marketing">
-        <div class="col-lg-6">
-          <h4>建構中</h4>
-          <p>網頁建構中</p>
+		<div class="row marketing">
+			<div class="col-lg-6">
+				<h4>建構中</h4>
+				<p>網頁建構中</p>
 
-          <h4>如何參與</h4>
-          <p>todo...</p>
+				<h4>如何參與</h4>
+				<p>todo...</p>
 
-        </div>
+			</div>
 
-        <div class="col-lg-6">
-          <h4>使用說明</h4>
-          <p>todo....</p>
+			<div class="col-lg-6">
+				<h4>幣值轉換 json</h4>
+				<p>
+					<a href="json/twdbtc.json">blackbananacoin.org/json/twdbtc.json</a>
+					<br /> <a href="json/blockchain_twd.json">blackbananacoin.org/json/blockchain_twd.json</a><br/>
+					<a href="https://blockchain.info/ticker">https://blockchain.info/ticker</a>
+				</p>
 
-          <h4>測試說明</h4>
-          <p>todo.....</p>
+				<h4>測試說明</h4>
+				<p>todo.....</p>
 
-        </div>
-      </div>
+			</div>
+		</div>
 
-      <div class="footer">
-        <p>&copy; Y12STUDIO 2013</p>
-      </div>
+		<div class="footer">
+			<p>&copy; Y12STUDIO 2013</p>
+		</div>
 
-    </div> <!-- /container -->
+	</div>
+	<!-- /container -->
 
 
-    <!-- Bootstrap core JavaScript
+	<!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-  </body>
+	<!-- Placed at the end of the document so the pages load faster -->
+</body>
 </html>
