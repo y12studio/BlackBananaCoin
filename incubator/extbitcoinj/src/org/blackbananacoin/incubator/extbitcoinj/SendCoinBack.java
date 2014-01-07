@@ -15,6 +15,7 @@
  */
 package org.blackbananacoin.incubator.extbitcoinj;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.math.BigInteger;
@@ -34,17 +35,23 @@ import com.google.common.util.concurrent.MoreExecutors;
  */
 public class SendCoinBack extends MyFooWallet {
 
+	public static final int AmountMultiplyTxFee = 1000;
+
 	@Override
 	protected void postCheckKeyOk() {
 
+		checkNotNull(getWallet());
+
+		Wallet w = getWallet();
+
+		checkNotNull(getParam());
+
 		try {
 			Address tpfaucetAddress;
-			tpfaucetAddress = new Address(TN3PARAMS, ADDR_tpfaucet_appspot_com);
-			Wallet w = getWallet();
-
-			// send 100x min tx fee back.
+			tpfaucetAddress = new Address(getParam(), ADDR_tpfaucet_appspot_com);
+			// send 500x min tx fee back.
 			BigInteger value = Transaction.REFERENCE_DEFAULT_MIN_TX_FEE
-					.multiply(BigInteger.valueOf(100));
+					.multiply(BigInteger.valueOf(AmountMultiplyTxFee));
 			System.out.println("Sendback " + value + "="
 					+ Utils.bitcoinValueToFriendlyString(value) + " BTC");
 			// Now send the coins back! Send with a small fee attached to ensure
@@ -75,7 +82,7 @@ public class SendCoinBack extends MyFooWallet {
 									+ sendResult.tx.getHashAsString());
 				}
 			}, MoreExecutors.sameThreadExecutor());
-			
+
 		} catch (WrongNetworkException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
