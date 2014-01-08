@@ -34,18 +34,33 @@
       <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
     <![endif]-->
-    
+
 <script>
-$(document).ready(function(){    
-	$.getJSON("json/twdbtc.json",function(data){
-		console.log(data.usdPerBtc);
-		var twdPerBtc = data.usdPerBtc*data.twdPerUsd;
-		$("#twdPerBtc").text(twdPerBtc.toFixed(2));
-		$("#twdTxFee").text(data.twdMinTxFee.toFixed(2));
-		var d = new Date(data.updateTimeMs);
-		$("#updateTime").text(d.toLocaleDateString()+' '+d.toLocaleTimeString());
-	});
-});
+	$(document).ready(
+			function() {
+				var twdPerBtc = 20000.0;
+				$.getJSON("json/twdbtc.json", function(data) {
+					console.log(data.usdPerBtc);
+					twdPerBtc = data.usdPerBtc * data.twdPerUsd;
+					$("#twdPerBtc").text(twdPerBtc.toFixed(2));
+					$("#twdTxFee").text(data.twdMinTxFee.toFixed(2));
+					var d = new Date(data.updateTimeMs);
+					$("#updateTime").text(
+							d.toLocaleDateString() + ' '
+									+ d.toLocaleTimeString());
+				});
+
+				$("#inputBtc").keyup(function() {
+					var btc = parseFloat($('#inputBtc').val()) * twdPerBtc;
+					$("#twdCalc").text(btc.toFixed(2));
+				});
+
+				$("#inputTwd").keyup(function() {
+					var twd = parseFloat($('#inputTwd').val()) / twdPerBtc;
+					$("#btcCalc").text(twd.toFixed(6));
+				});
+
+			});
 </script>
 </head>
 
@@ -62,8 +77,8 @@ $(document).ready(function(){
 		</div>
 
 		<div class="jumbotron">
-			<h1>黑蕉幣專案 BKBC</h1>
-			<p class="lead">BlacK Banana Coin(BKBC)建立測試研究比特幣線上交易系統</p>
+			<h2>黑蕉幣專案 BlacK Banana Coin(BKBC)</h2>
+			<p class="lead">BKBC目前為實驗初期狀態，初期以研究測試比特幣Bitcoin交易系統應用程式及相關數位幣生態為主。</p>
 			<p>
 				<img src="img/black_banana.png">
 			</p>
@@ -72,34 +87,51 @@ $(document).ready(function(){
 					href="https://github.com/y12studio/BlackBananaCoin" role="button">加入專案</a>
 			</p>
 		</div>
-		
+
 		<div class="jumbotron">
-			<p class="lead">即時資訊</p>
-			<p class="lead">1比特幣(BTC)~=<span id="twdPerBtc" class="label label-danger">0</span>新台幣(TWD)</p>
-			<p class="lead">最低手續費0.0001BTC~=<span id="twdTxFee" class="label label-danger">0</span>新台幣(TWD)</p>
-			<p class="lead">更新時間<span id="updateTime">2014-01-04</span></p>
+			<p class="lead">Bitcoin BTC/TWD 即時資訊</p>
+			<p class="lead">
+				1比特幣(BTC)~=<span id="twdPerBtc" class="label label-danger">0</span>新台幣(TWD)
+			</p>
+			<p class="lead">
+				最低手續費0.0001BTC~=<span id="twdTxFee" class="label label-danger">0</span>新台幣(TWD)
+			</p>
+			<p class="lead">
+				更新時間<span id="updateTime">2014-01-04</span>
+			</p>
+			<p>
+				<input type="text" id="inputBtc" style="width: 120px;" value="0.0" />BTC~=<span
+					id="twdCalc" class="label label-danger">0.000</span>新台幣(TWD)
+			</p>
+			<p>
+				<input type="text" id="inputTwd" style="width: 120px;" value="0.0" />TWD~=<span
+					id="btcCalc" class="label label-info">0.000</span>比特幣(BTC)
+			</p>
 		</div>
 
 		<div class="row marketing">
 			<div class="col-lg-6">
-				<h4>建構中</h4>
-				<p>網頁建構中</p>
+				<h4>專案說明</h4>
+				<p>這是一個專注在台灣環境建立類似比特幣的數位幣線上交易生態系統的實驗專案，注重在觀察、學習、實做與討論這類系統。請注意該專案目前專注在數位幣發行概念「實驗」，是否演變為成熟可靠的專案無從保證，請參與開發者投注心力資源時注意。</p>
 
 				<h4>如何參與</h4>
-				<p>todo...</p>
+				<p>
+					<a href="https://github.com/y12studio/BlackBananaCoin">github
+						y12studio/BlackBananaCoin</a>
+				</p>
 
 			</div>
 
 			<div class="col-lg-6">
-				<h4>幣值轉換 json</h4>
+				<h4>開放幣值轉換 json api</h4>
 				<p>
 					<a href="json/twdbtc.json">blackbananacoin.org/json/twdbtc.json</a>
-					<br /> <a href="json/blockchain_twd.json">blackbananacoin.org/json/blockchain_twd.json</a><br/>
-					<a href="https://blockchain.info/ticker">https://blockchain.info/ticker</a>
+					<br /> <a href="json/blockchain_twd.json">blackbananacoin.org/json/blockchain_twd.json</a><br />
 				</p>
 
-				<h4>測試說明</h4>
-				<p>todo.....</p>
+				<h4>相關連結</h4>
+				<a href="https://blockchain.info/ticker">https://blockchain.info/ticker</a><BR />
+				<a href="http://markets.blockchain.info/">markets.blockchain.info</a>
 
 			</div>
 		</div>

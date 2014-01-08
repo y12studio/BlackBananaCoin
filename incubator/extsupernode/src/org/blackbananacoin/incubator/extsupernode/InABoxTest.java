@@ -42,22 +42,20 @@ public class InABoxTest {
 	private static final Logger log = LoggerFactory.getLogger(InABoxTest.class);
 	private int sendBtc = 6;
 	private static SuperNodeApiTester box;
-	private static BCSAPI api;
 
-	public void init() throws IOException, ValidationException,
+	public void start() throws IOException, ValidationException,
 			BCSAPIException, InterruptedException {
 		box = new SuperNodeApiTester(new MinerTestChain());
-		api = box.getApi();
 		run();
 	}
 
 	public void run() throws BCSAPIException, InterruptedException {
-		checkNotNull(api);
+		checkNotNull(box.getApi());
 		final Address target = ECKeyPair.createNew(true).getAddress();
 		log.debug("Target account address = " + target);
 		AddressListAccountManager targetAccount = new AddressListAccountManager();
 		targetAccount.addAddress(target);
-		api.registerTransactionListener(targetAccount);
+		box.getApi().registerTransactionListener(targetAccount);
 
 		ECKeyPair miner = ECKeyPair.createNew(true);
 		Address a = miner.getAddress();
@@ -65,10 +63,10 @@ public class InABoxTest {
 		box.setNewCoinsAddress(a);
 		final KeyListAccountManager minerAccount = new KeyListAccountManager();
 		minerAccount.addKey(miner);
-		api.registerTransactionListener(minerAccount);
+		box.getApi().registerTransactionListener(minerAccount);
 
 		final Semaphore blockMined = new Semaphore(0);
-		api.registerTrunkListener(new TrunkListener() {
+		box.getApi().registerTrunkListener(new TrunkListener() {
 			@Override
 			public void trunkUpdate(List<Block> removed, List<Block> added) {
 				blockMined.release();
@@ -102,13 +100,12 @@ public class InABoxTest {
 					minerAccountChanged.acquireUninterruptibly();
 					targetAccountChanged.acquireUninterruptibly();
 				}
-
 				log.info("[MinerAccount balance={}, SEND Target " + sendBtc
 						+ " BTC]",
 						BkbcUtils.toBtcStr(minerAccount.getBalance()));
 				Transaction t = minerAccount.pay(target, sendBtc
 						* BkbcUtils.BTC, 0, true);
-				api.sendTransaction(t);
+				box.getApi().sendTransaction(t);
 				targetAccountChanged.acquireUninterruptibly();
 				minerAccountChanged.acquireUninterruptibly();
 				log.info("[MinerAccount balance={}]",
@@ -129,7 +126,7 @@ public class InABoxTest {
 	public static void main(String[] args) throws IOException,
 			ValidationException, BCSAPIException, InterruptedException {
 		InABoxTest st = new InABoxTest();
-		st.init();
+		st.start();
 	}
 
 }

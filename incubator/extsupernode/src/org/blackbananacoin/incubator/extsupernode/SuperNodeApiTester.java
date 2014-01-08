@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,25 +55,21 @@ import com.google.common.collect.Range;
 
 public class SuperNodeApiTester {
 
-	private final class MyFoo implements Runnable {
+	private final class MyMinerThread extends Thread {
 		private final int numberOfTxInBlock;
-		private final BlockingQueue<Transaction> mempool;
+		private final BlockingQueue<Transaction> mempool = new LinkedBlockingQueue<Transaction>();
 		private final int nblocks;
-		private final Set<String> seen;
+		private final Set<String> seen = new HashSet<String>();
 		private final int timeout;
 
-		private MyFoo(int numberOfTxInBlock,
-				BlockingQueue<Transaction> mempool, int nblocks,
-				Set<String> seen, int timeout) {
+		private MyMinerThread(int numberOfTxInBlock, int nblocks, int timeout) {
 			this.numberOfTxInBlock = numberOfTxInBlock;
-			this.mempool = mempool;
 			this.nblocks = nblocks;
-			this.seen = seen;
 			this.timeout = timeout;
+			txhandler.addTransactionListener(new MineTxListener(seen, mempool));
 		}
 
 		public void run() {
-			txhandler.addTransactionListener(new MineTxListener(seen, mempool));
 			String previousHash = chain.getGenesis().getHash();
 			for (int blockHeight = 1; blockHeight <= nblocks; ++blockHeight) {
 				try {
@@ -89,22 +86,25 @@ public class SuperNodeApiTester {
 		private Block prepareBlockToMine(String previousHash, int blockHeight)
 				throws ValidationException {
 			Transaction coinbase = Transaction.createCoinbase(minerAddress,
-					MinerTestChain.REWARD_COINS * BkbcUtils.BTC,
-					blockHeight);
+					MinerTestChain.REWARD_COINS * BkbcUtils.BTC, blockHeight);
 			Block block = createBlock(previousHash, coinbase);
 			if (blockHeight > 1) {
-				mempool.drainTo(block.getTransactions());
-				if (block.getTransactions().size() < numberOfTxInBlock) {
+				List<Transaction> translist = block.getTransactions();
+				// only poll once ??
+				if (translist.size() < numberOfTxInBlock) {
 					try {
 						Transaction t = mempool.poll(timeout,
 								TimeUnit.MILLISECONDS);
 						if (t != null) {
-							block.getTransactions().add(t);
-							mempool.drainTo(block.getTransactions());
+							translist.add(t);
 						}
 					} catch (InterruptedException e) {
 					}
 				}
+				// Why drainTo??
+				//mempool.drainTo(translist);
+				log.debug("[PREPARE Block with transaction list size ={}]",
+						translist.size());
 			}
 			return block;
 		}
@@ -114,7 +114,8 @@ public class SuperNodeApiTester {
 		private final Set<String> seen;
 		private final BlockingQueue<Transaction> mempool;
 
-		private MineTxListener(Set<String> seen, BlockingQueue<Transaction> mempool) {
+		private MineTxListener(Set<String> seen,
+				BlockingQueue<Transaction> mempool) {
 			this.seen = seen;
 			this.mempool = mempool;
 		}
@@ -124,8 +125,8 @@ public class SuperNodeApiTester {
 				if (!transaction.getInputs().get(0).getSourceHash()
 						.equals(Hash.ZERO_HASH_STRING)
 						&& !seen.contains(transaction.getHash())) {
-					Transaction t = Transaction
-							.fromWireDump(transaction.toWireDump());
+					Transaction t = Transaction.fromWireDump(transaction
+							.toWireDump());
 					mempool.offer(t);
 					seen.add(transaction.getHash());
 				}
@@ -191,9 +192,7 @@ public class SuperNodeApiTester {
 
 	public void mine(final int nblocks, final int numberOfTxInBlock,
 			final int timeout) {
-		final BlockingQueue<Transaction> mempool = new LinkedBlockingQueue<Transaction>();
-		final Set<String> seen = new HashSet<String>();
-		Thread miner = new Thread(new MyFoo(numberOfTxInBlock, mempool, nblocks, seen, timeout));
+		Thread miner = new MyMinerThread(numberOfTxInBlock, nblocks, timeout);
 		miner.setName("Miner in the box");
 		miner.setDaemon(true);
 		miner.start();
@@ -216,15 +215,7 @@ public class SuperNodeApiTester {
 	}
 
 	public void init() throws IOException, ValidationException {
-		LvlStore store = new LvlStore();
-		store.setStore(new LvlMemoryStore());
-		FixedAddressDiscovery discovery = new FixedAddressDiscovery();
-		discovery.setConnectTo("localhost");
-		network = new BitcoinNetwork(0);
-		network.setChain(chain);
-		network.setStore(store);
-		network.setListen(false);
-		network.setDiscovery(discovery);
+		createNetwork();
 		txhandler = new TxHandler(network);
 		setApi(new JMSServerConnector());
 		getApi().setConnectionFactory(connectionFactory);
@@ -233,6 +224,18 @@ public class SuperNodeApiTester {
 		reset();
 		bcsapi.init();
 		getApi().init();
+	}
+
+	private void createNetwork() throws IOException {
+		FixedAddressDiscovery discovery = new FixedAddressDiscovery();
+		discovery.setConnectTo("localhost");
+		LvlStore store = new LvlStore();
+		store.setStore(new LvlMemoryStore());
+		network = new BitcoinNetwork(0);
+		network.setChain(chain);
+		network.setStore(store);
+		network.setListen(false);
+		network.setDiscovery(discovery);
 	}
 
 	public void reset() throws ValidationException {

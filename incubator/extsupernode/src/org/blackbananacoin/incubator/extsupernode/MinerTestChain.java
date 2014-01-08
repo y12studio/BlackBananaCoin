@@ -66,7 +66,7 @@ public class MinerTestChain  implements Chain{
 	@Override
 	public long getMagic ()
 	{
-		return 0xDAB5BFFAL;
+		return 0xAB19CD49L;
 	}
 
 	@Override
