@@ -28,9 +28,7 @@ http://blackbananacoin.org/p/signbitcoin-odf-2014/
 
 ### 契約範本
 
-http://blackbananacoin.org/p/signbitcoin-odf-2014/template_v140317.odt
-
-範本採用創用 CC 姓名標示-相同方式分享 4.0 國際 授權條款授權.
+[OpenDocument odt 範本](http://blackbananacoin.org/p/signbitcoin-odf-2014/template_v140317.odt) 採用創用 CC 姓名標示-相同方式分享 4.0 國際 授權條款授權，簽名必須採用 Open Document 格式，如要預覽可參考[pdf 版本](http://blackbananacoin.org/p/signbitcoin-odf-2014/template_v140317.pdf)。
 
 ### 相關參考
 
