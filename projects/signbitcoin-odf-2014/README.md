@@ -22,7 +22,9 @@ Windows
 文件已簽名
 
 ### 契約範本
-http://blackbananacoin.org/bkbc-tool/sign/template_v140317.odt
+http://blackbananacoin.org/p/signbitcoin-odf-2014/template_v140317.odt
+
+範本採用創用 CC 姓名標示-相同方式分享 4.0 國際 授權條款授權.
 
 ### 相關參考
 [MOICA內政部憑證管理中心](http://moica.nat.gov.tw/)
