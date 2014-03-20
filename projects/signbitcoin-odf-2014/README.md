@@ -33,4 +33,5 @@ http://blackbananacoin.org/p/signbitcoin-odf-2014/
 ### 相關參考
 
 - [MOICA內政部憑證管理中心](http://moica.nat.gov.tw/)
+- [政府簽發憑證簽名測試 · Issue #5 · y12studio/bkbc-tools](https://github.com/y12studio/bkbc-tools/issues/5)
 - [主權幣 auroracoin · Issue #27 · y12studio/BlackBananaCoin](https://github.com/y12studio/BlackBananaCoin/issues/27)
