@@ -1,4 +1,4 @@
-黑蕉幣 BlackBananaCoin BKBC 
+黑蕉幣 BlackBananaCoin BKBC :smile:
 
 ![BKBC](https://raw.github.com/y12studio/BananaCoin/master/resources/black_banana.png)
 
