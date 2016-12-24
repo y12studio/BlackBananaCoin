@@ -1,3 +1,5 @@
+**This project is not being actively developed or maintained.**
+
 黑蕉幣 BlackBananaCoin BKBC :smile:
 
 ![BKBC](https://raw.github.com/y12studio/BananaCoin/master/resources/black_banana.png)
